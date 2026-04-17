@@ -320,6 +320,26 @@ async function compareStocks() {
     const d1 = await (await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/data/${s1}`)).json();
     const d2 = await (await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/data/${s2}`)).json();
 
+    const sum1 = await (await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/summary/${s1}`)).json();
+    const sum2 = await (await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/summary/${s2}`)).json();
+
+    // 🔥 UPDATE SUMMARY FOR BOTH STOCKS
+    document.getElementById("summary").innerHTML = `
+        <div class="card">
+            <p>${s1}</p>
+            <p>High: ${sum1["52_week_high"].toFixed(2)}</p>
+            <p>Low: ${sum1["52_week_low"].toFixed(2)}</p>
+            <p>Avg: ${sum1["average_close"].toFixed(2)}</p>
+        </div>
+
+        <div class="card">
+            <p>${s2}</p>
+            <p>High: ${sum2["52_week_high"].toFixed(2)}</p>
+            <p>Low: ${sum2["52_week_low"].toFixed(2)}</p>
+            <p>Avg: ${sum2["average_close"].toFixed(2)}</p>
+        </div>
+    `;
+
     if (chart) chart.destroy();
 
     const ctx = document.getElementById("chart").getContext("2d");
