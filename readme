@@ -1,0 +1,131 @@
+# 📈 Stock Data Intelligence Dashboard
+
+## 🚀 Overview
+
+A full-stack stock market dashboard that fetches real-time data, processes it using data analysis techniques, and visualizes insights through an interactive web interface.
+
+This project demonstrates backend API development, data transformation, and frontend visualization along with a simple predictive analytics feature.
+
+---
+
+## ⚙️ Tech Stack
+
+### 🔹 Backend
+
+* FastAPI (Python)
+* Pandas
+* yfinance
+
+### 🔹 Frontend
+
+* HTML, CSS, JavaScript
+* Chart.js
+
+### 🔹 Deployment
+
+* Backend: Render
+* Frontend: GitHub Pages
+
+---
+
+## 📊 Features
+
+### 🔹 Data Collection
+
+* Fetches real-time stock data using yfinance API
+* Supports NSE stocks (e.g., INFY.NS, TCS.NS)
+
+### 🔹 Data Processing
+
+* Handles missing values and formatting
+* Converts date columns properly
+* Calculates key financial metrics:
+
+  * Daily Return
+  * 7-day Moving Average
+  * 52-week High/Low
+  * Volatility (custom metric)
+
+---
+
+## 🔗 REST APIs
+
+| Endpoint            | Method | Description                          |
+| ------------------- | ------ | ------------------------------------ |
+| `/companies`        | GET    | List available companies             |
+| `/data/{symbol}`    | GET    | Last 30 days stock data              |
+| `/summary/{symbol}` | GET    | 52-week high, low, average           |
+| `/compare`          | GET    | Compare two stocks                   |
+| `/predict/{symbol}` | GET    | Predict next price (simple ML logic) |
+
+---
+
+## 📈 Dashboard Features
+
+* 📊 Interactive stock price chart
+* 🔁 Compare two stocks
+* 📉 Trend detection (Uptrend / Downtrend)
+* ⚡ Volatility indicator
+* 💬 Mock sentiment analysis
+* 🤖 Price prediction (basic ML logic)
+
+---
+
+## 🧠 Custom Metrics
+
+* **Volatility**: Rolling standard deviation of daily returns
+* **Sentiment**: Derived from price movement (positive/negative)
+* **Prediction**: Simple momentum-based next price estimation
+
+---
+
+## ▶️ How to Run Locally
+
+### 🔹 Backend
+
+```bash
+pip install -r requirements.txt
+uvicorn app:app --reload
+```
+
+### 🔹 Frontend
+
+Open:
+
+```bash
+frontend/index.html
+```
+
+---
+
+## 🌐 Deployment
+
+* Backend hosted on Render
+* Frontend hosted on GitHub Pages
+
+---
+
+## 📌 Future Improvements
+
+* Add advanced ML models (LSTM / ARIMA)
+* Add filters (30/90 days)
+* Improve UI with React
+* Add authentication
+
+---
+
+## 🎯 Learning Outcomes
+
+* Built REST APIs using FastAPI
+* Processed real-world financial data using Pandas
+* Implemented data visualization using Chart.js
+* Integrated frontend with backend APIs
+* Deployed a full-stack application
+
+---
+
+##  Author
+
+Developed by Prakhar Shrivastava
+
+---

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            color: white;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .main {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #1e293b;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #334155;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .sidebar button:hover {
+            background: #3b82f6;
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        select, button {
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+        }
+
+        select {
+            background: #334155;
+            color: white;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        /* SUMMARY CARDS */
+        .summary {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 15px 20px;
+            border-radius: 10px;
+            min-width: 150px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        }
+
+        .card p {
+            margin: 5px 0;
+        }
+
+        /* CHART BOX */
+        .chart-container {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #chart {
+            width: 100% !important;
+            height: 400px !important;
+            background: white;
+            border-radius: 10px;
+        }
+
+        #loading {
+            text-align: center;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>📈 Stock Dashboard</h2>
+
+<div class="main">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h3>Companies</h3>
+        <button onclick="loadData('INFY.NS')">Infosys</button>
+        <button onclick="loadData('TCS.NS')">TCS</button>
+        <button onclick="loadData('RELIANCE.NS')">Reliance</button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- CONTROLS -->
+        <div class="controls">
+            <select id="stockSelect">
+                <option value="INFY.NS">Infosys</option>
+                <option value="TCS.NS">TCS</option>
+                <option value="RELIANCE.NS">Reliance</option>
+            </select>
+
+            <button onclick="loadData()">Load Data</button>
+
+            <br>
+
+            <select id="stock1">
+                <option value="INFY.NS">Infosys</option>
+                <option value="TCS.NS">TCS</option>
+                <option value="RELIANCE.NS">Reliance</option>
+            </select>
+
+            <select id="stock2">
+                <option value="TCS.NS">TCS</option>
+                <option value="INFY.NS">Infosys</option>
+                <option value="RELIANCE.NS">Reliance</option>
+            </select>
+
+            <button onclick="compareStocks()">Compare</button>
+        </div>
+
+        <!-- SUMMARY -->
+        <div id="summary" class="summary"></div>
+
+        <p id="loading"></p>
+
+        <!-- CHART -->
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+let chart;
+
+async function loadData(symbolFromClick=null) {
+    const symbol = symbolFromClick || document.getElementById("stockSelect").value;
+
+    document.getElementById("loading").innerText = "Loading...";
+
+    const response = await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/data/${symbol}`);
+    const data = await response.json();
+
+    const summaryRes = await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/summary/${symbol}`);
+    const predRes = await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/predict/${symbol}`);
+    const pred = await predRes.json();
+    const summary = await summaryRes.json();
+
+    const prices = data.map(item => item.Close);
+    const labels = data.map(item => item.Date);
+
+    const vol = data[data.length - 1].Volatility || 0;
+    const sentiment = data[data.length - 1].Sentiment || "N/A";
+
+    const trend = prices[prices.length-1] > prices[0] ? "📈 Uptrend" : "📉 Downtrend";
+
+document.getElementById("summary").innerHTML = `
+    <div class="card"><p>High</p><b>${summary["52_week_high"].toFixed(2)}</b></div>
+    <div class="card"><p>Low</p><b>${summary["52_week_low"].toFixed(2)}</b></div>
+    <div class="card"><p>Avg</p><b>${summary["average_close"].toFixed(2)}</b></div>
+    <div class="card"><p>Volatility</p><b>${vol.toFixed(4)}</b></div>
+    <div class="card"><p>Sentiment</p><b>${sentiment}</b></div>
+    <div class="card"><p>Trend</p><b>${trend}</b></div>
+
+    <!-- 🔥 NEW -->
+    <div class="card"><p>Prediction</p><b>${pred.predicted_price.toFixed(2)}</b></div>
+`;
+
+    if (chart) chart.destroy();
+
+    const ctx = document.getElementById("chart").getContext("2d");
+
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: symbol,
+                data: prices,
+                borderColor: "#3b82f6",
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    document.getElementById("loading").innerText = "";
+}
+
+async function compareStocks() {
+    const s1 = document.getElementById("stock1").value;
+    const s2 = document.getElementById("stock2").value;
+
+    document.getElementById("loading").innerText = "Comparing...";
+
+    const d1 = await (await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/data/${s1}`)).json();
+    const d2 = await (await fetch(`https://jarnox-assignment-1-ix9e.onrender.com/data/${s2}`)).json();
+
+    if (chart) chart.destroy();
+
+    const ctx = document.getElementById("chart").getContext("2d");
+
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: d1.map(x => x.Date),
+            datasets: [
+                {
+                    label: s1,
+                    data: d1.map(x => x.Close),
+                    borderColor: "#3b82f6"
+                },
+                {
+                    label: s2,
+                    data: d2.map(x => x.Close),
+                    borderColor: "#ef4444"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    document.getElementById("loading").innerText = "";
+}
+</script>
+
+</body>
+</html>
